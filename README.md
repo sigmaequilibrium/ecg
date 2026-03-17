@@ -42,10 +42,14 @@ This prints:
 - validation issue count and sample issues.
 
 
-## Quick install/setup
+## Install scripts
 
-Use the setup script to create a local virtualenv, install the package, create common
-project directories, and initialize a SQLite database used for analysis runs:
+This repository includes install/setup helpers in `scripts/`.
+
+### `scripts/install.sh` (recommended)
+
+Use the setup script to create a local virtualenv, install the package in editable mode,
+create common project directories, and initialize a SQLite database used for analysis runs:
 
 ```bash
 bash scripts/install.sh
@@ -56,7 +60,15 @@ Optional environment overrides:
 - `VENV_DIR`: where to create the virtualenv (default: `.venv`)
 - `DB_PATH`: SQLite database path (default: `data/ecg_analysis.db`)
 
-Database-only initialization:
+Example with custom paths:
+
+```bash
+VENV_DIR=$HOME/.venvs/ecg DB_PATH=$PWD/data/local.db bash scripts/install.sh
+```
+
+### `scripts/init_db.py` (database only)
+
+If your Python environment is already set up, you can initialize only the SQLite database:
 
 ```bash
 PYTHONPATH=src python scripts/init_db.py --db-path data/ecg_analysis.db
