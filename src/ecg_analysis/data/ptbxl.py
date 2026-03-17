@@ -1,18 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Iterable, Sequence
+from typing import TYPE_CHECKING, Iterable, Sequence
 
-import numpy as np
 import pandas as pd
 
 from ecg_analysis.config import PTBXLConfig
 
-try:
-    import wfdb
-except Exception:  # pragma: no cover - optional dependency in minimal package
-    wfdb = None
+if TYPE_CHECKING:
+    import numpy as np
 
 
 @dataclass(frozen=True)
@@ -60,9 +56,12 @@ class PTBXLLoader:
         if "ecg_id" not in df.columns:
             raise ValueError("Expected `ecg_id` column in PTB-XL metadata CSV")
 
-        df["split"] = df.get("strat_fold", pd.Series([None] * len(df))).apply(
-            self._fold_to_split
-        )
+        if "strat_fold" in df.columns:
+            fold_series = df["strat_fold"]
+        else:
+            fold_series = pd.Series([None] * len(df))
+
+        df["split"] = fold_series.apply(self._fold_to_split)
         return df
 
     def iter_records(self, split: str | None = None) -> Iterable[RecordMetadata]:
@@ -85,10 +84,12 @@ class PTBXLLoader:
         self,
         record: RecordMetadata,
         high_resolution: bool = True,
-    ) -> tuple[np.ndarray, list[str]]:
+    ) -> tuple["np.ndarray", list[str]]:
         """Read waveform samples and lead names from WFDB records."""
-        if wfdb is None:
-            raise ImportError("wfdb is required to read PTB-XL waveform files")
+        try:
+            import wfdb
+        except Exception as exc:  # pragma: no cover - optional dependency in minimal package
+            raise ImportError("wfdb is required to read PTB-XL waveform files") from exc
 
         rel_path = record.filename_hr if high_resolution else record.filename_lr
         if not rel_path:

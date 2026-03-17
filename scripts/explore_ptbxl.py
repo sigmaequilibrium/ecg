@@ -4,15 +4,15 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from ecg_analysis.config import PTBXLConfig
-from ecg_analysis.data.ptbxl import PTBXLLoader
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Quick PTB-XL exploratory summary")
     parser.add_argument("root", type=Path, help="Path to PTB-XL root folder")
     parser.add_argument("--beats-csv", type=str, default=None, help="Optional beat annotation CSV")
     args = parser.parse_args()
+
+    from ecg_analysis.config import PTBXLConfig
+    from ecg_analysis.data.ptbxl import PTBXLLoader
 
     config = PTBXLConfig(root=args.root, beats_csv=args.beats_csv)
     loader = PTBXLLoader(config)
