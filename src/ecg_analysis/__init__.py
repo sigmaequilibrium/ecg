@@ -1,1 +1,3 @@
-"""ECG analysis package for wave area studies."""
+"""ECG analysis package."""
+
+__all__ = ["features", "reporting"]

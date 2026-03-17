@@ -1,41 +1,42 @@
-# ECG Beat/Lead Wave Area Analysis
+# ECG Analysis (minimal PTB-XL package)
 
-This project runs beat-level and lead-level ECG area analysis for the hypothesis:
+This repository contains a minimal analysis package for loading PTB-XL(+) metadata,
+waveforms, and optional beat-level annotations.
 
-- `QRS area ~ T area + Q area`
-- ratio: `QRS / (T + Q)`
+## Folder layout
 
-It includes:
-- per-beat/per-lead area extraction (`Q`, `QRS`, `T`, `T+Q`), signed and absolute
-- descriptive statistics by `split` and `lead`
-- visualization outputs as SVG overlays and a ratio histogram
+Expected PTB-XL(+) files under a dataset root (for example `/data/ptbxl`):
 
-## Expected data layout
-
-Under `data/ptbxl_plus` (or your `--data-dir`):
-
-- `metadata.csv`
-  - `record_id,split,fs,leads`
-- `delineations.csv`
-  - `record_id,beat_index,p_end,q_onset,q_offset,s_offset,t_onset,t_offset`
-- `signals/<record_id>.csv`
-  - signal matrix with rows as samples and columns as leads
-
-## Run demo
-
-```bash
-python scripts/run_area_analysis.py --demo
+```text
+/data/ptbxl/
+  ptbxl_database.csv
+  scp_statements.csv                 # optional in this minimal package
+  records100/...
+  records500/...
+  beat_annotations.csv               # optional custom/derived file
 ```
 
-## Run with your dataset
+Where:
+- `ptbxl_database.csv` is required and must include `ecg_id` plus PTB-XL fields like
+  `patient_id`, `strat_fold`, `sampling_rate`, `filename_lr`, `filename_hr`.
+- `beat_annotations.csv` is optional and should include at least:
+  `record_id`, `beat_index`, `lead`, and any of:
+  `q_onset`, `q_offset`, `r_peak`, `s_offset`, `t_onset`, `t_offset`.
+
+## Package structure
+
+- `src/ecg_analysis/config.py`: `PTBXLConfig` with dataset paths and split mapping.
+- `src/ecg_analysis/data/ptbxl.py`: loader, normalized beat schema, and validation.
+- `scripts/explore_ptbxl.py`: quick CLI summary for exploratory runs.
+
+## Run exploratory summary
 
 ```bash
-python scripts/run_area_analysis.py --data-dir data/ptbxl_plus
+PYTHONPATH=src python scripts/explore_ptbxl.py /data/ptbxl --beats-csv beat_annotations.csv
 ```
 
-## Outputs
-
-- `data/processed/areas.csv`
-- `reports/tables/descriptive_stats.csv`
-- `reports/figures/overlay_*.svg`
-- `reports/figures/ratio_distribution.svg`
+This prints:
+- total records,
+- split distribution (from PTB-XL folds),
+- annotation count,
+- validation issue count and sample issues.
