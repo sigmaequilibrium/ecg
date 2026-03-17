@@ -40,3 +40,24 @@ This prints:
 - split distribution (from PTB-XL folds),
 - annotation count,
 - validation issue count and sample issues.
+
+
+## Quick install/setup
+
+Use the setup script to create a local virtualenv, install the package, create common
+project directories, and initialize a SQLite database used for analysis runs:
+
+```bash
+bash scripts/install.sh
+```
+
+Optional environment overrides:
+
+- `VENV_DIR`: where to create the virtualenv (default: `.venv`)
+- `DB_PATH`: SQLite database path (default: `data/ecg_analysis.db`)
+
+Database-only initialization:
+
+```bash
+PYTHONPATH=src python scripts/init_db.py --db-path data/ecg_analysis.db
+```
