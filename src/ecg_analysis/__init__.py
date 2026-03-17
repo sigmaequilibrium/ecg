@@ -1,5 +1,3 @@
-"""Minimal ECG analysis package."""
+"""ECG analysis package."""
 
-from .config import PTBXLConfig
-
-__all__ = ["PTBXLConfig"]
+__all__ = ["features", "reporting"]
